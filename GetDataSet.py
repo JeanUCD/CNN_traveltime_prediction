@@ -45,6 +45,7 @@ class TTdataset(Dataset):
         # Normalize the pixel values to [0,1]
         image = io.imread(img_name)/255
         traveltime = self.traveltime_frame.iloc[idx, 1]
+        
         sample = {'image': image, 'traveltime': traveltime}
 
         if self.transform:

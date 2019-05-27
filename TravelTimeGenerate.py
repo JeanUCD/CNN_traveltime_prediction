@@ -35,10 +35,19 @@ def GetTravelTime_by5min(df,date_index):
         TT_by5min = []
         for j in range(int(24*60/5)):
             TT_by5min.append(0)
-            time_mark_by5min = (j+1)*5/60/24
+            TT_buff = []
+            time_mark_by5min_start = (j)*5/60/24
+            time_mark_by5min_end = (j+1)*5/60/24
             for k in range(nrow-1):
-                if Time_segment[k][0] < time_mark_by5min and Time_segment[k+1][0] > time_mark_by5min:
-                    TT_by5min[j] = TT_segment[k][0]
+                if (Time_segment[k][0] >= time_mark_by5min_start) and (Time_segment[k][0] <= time_mark_by5min_end):
+                    TT_buff.append(TT_segment[k][0])                    
+            # delete outliers
+            TT_buff = np.array(TT_buff)
+            TT_mean = np.mean(TT_buff,axis = 0)
+            sd = np.std(TT_buff, axis = 0)
+            TT_buff = [x for x in TT_buff if (x > TT_mean - 1 * sd)]
+            TT_buff = [x for x in TT_buff if (x < TT_mean + 1 * sd)]
+            TT_by5min[j] = np.mean(TT_buff)
         TT.append(TT_by5min)
     return TT
     
@@ -65,6 +74,7 @@ def SaveTravelTime_withImgName(df,date_index,datatype):
     for i in range(AggTT.shape[0]):
         Image_name.append("{}_{}_{}.jpg".format(datatype,1014+date_index,i))
     AggTT['Img_name'] = pd.Series(Image_name)
+    AggTT = AggTT.dropna(axis = 0, how = "any") # delete data with NAs
     AggTT.to_csv(pwd+"/TravelTime/{}_{}.csv".format(datatype, date_index))
 
 # Save the csvs

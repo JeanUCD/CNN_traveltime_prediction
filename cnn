@@ -30,8 +30,8 @@ from GetDataSet import TTdataset,ToTensor
 data_transform = ToTensor()
 
 # choose the training and test datasets
-train_data = TTdataset(csv_file=pwd+'/TravelTime/combined_occupancy.csv', 
-                       root_dir = pwd+'/Pics/occupancy', transform=data_transform)
+train_data = TTdataset(csv_file=pwd+'/TravelTime/combined_speed.csv', 
+                       root_dir = pwd+'/Pics/speed', transform=data_transform)
 
 
 # Print out some stats about the training and test data
@@ -40,7 +40,7 @@ print('Train data, number of images: ', len(train_data))
 
 # prepare data loaders, set the batch_size
 ## when you get to training your network, see how batch_size affects the loss
-batch_size = 20
+batch_size = 10
 
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 
@@ -71,15 +71,17 @@ class Net(nn.Module):
         self.conv2 = nn.Conv2d(10, 20, 3)
         
          # 20 outputs * the 5*5 filtered/pooled map size
-        self.fc1 = nn.Linear(20*5*5, 60)
+        self.fc1 = nn.Linear(20*5*5, 200)
         
         # dropout with p=0.4
         self.fc1_drop = nn.Dropout(p=0.4)
         
         # finally, create 1 output channel 
-        self.fc2 = nn.Linear(60, 20)
+        self.fc2 = nn.Linear(200, 100)
+        self.fc3 = nn.Linear(100, 50)
+        self.fc4 = nn.Linear(50,25)
+        self.fc5 = nn.Linear(25,1)
         
-        self.fc3 = nn.Linear(20,1)
         
 
     # define the feedforward behavior
@@ -96,10 +98,10 @@ class Net(nn.Module):
           # two linear layers with dropout in between
         x = F.relu(self.fc1(x))
         x = self.fc1_drop(x)
-        x = self.fc2(x)
-        x = self.fc3(x)
+        x = self.fc5(self.fc4(self.fc3(self.fc2(x))))
+      
         # final output
-        
+            
         return x
 
 # instantiate and print your Net
@@ -149,7 +151,7 @@ def train(n_epochs):
             outputs = net(inputs)
            
             # calculate the loss
-            loss = F.mse_loss(outputs, labels/4000,True)
+            loss = F.mse_loss(outputs,(labels-421)/(2069-421),True)
 
             # backward pass to calculate the parameter gradients
             loss.backward()
@@ -161,9 +163,9 @@ def train(n_epochs):
             # to convert loss into a scalar and add it to running_loss, we use .item()
             running_loss += loss.item()
             
-            if batch_i % 100 == 99:    # print every 100 batches
-                avg_loss = running_loss/100
-                # record and print the avg loss over the 100 batches
+            if batch_i % 150 == 144: # print every 30 batches
+                avg_loss = running_loss/150
+                # record and print the avg loss over the 30 batches
                 loss_over_time.append(avg_loss)
                 print('Epoch: {}, Batch: {}, Avg. Loss: {}'.format(epoch + 1, batch_i+1, avg_loss))
                 running_loss = 0.0
@@ -172,7 +174,7 @@ def train(n_epochs):
     return loss_over_time
 
 # define the number of epochs to train for
-n_epochs = 50 # start small to see if your model works, initially
+n_epochs = 100 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss = train(n_epochs)
@@ -181,7 +183,7 @@ training_loss = train(n_epochs)
 plt.plot(training_loss)
 plt.xlabel('100\'s of batches')
 plt.ylabel('loss')
-plt.ylim(0, 0.03) # consistent scale
+#plt.ylim(0, 100000) # consistent scale
 plt.show()
 
 
