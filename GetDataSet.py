@@ -45,7 +45,9 @@ class TTdataset(Dataset):
         # Normalize the pixel values to [0,1]
         image = io.imread(img_name)/255
         traveltime = self.traveltime_frame.iloc[idx, 1]
-        
+          # one-hot encoding
+        TT_onehot = np.zeros((1,10))
+        TT_onehot[0,int(traveltime)] = 1
         sample = {'image': image, 'traveltime': traveltime}
 
         if self.transform:

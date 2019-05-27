@@ -103,10 +103,10 @@ def SaveImage(df, window_len, GetDataFun, datatype, date):
 
 pwd = os.path.abspath('.')
 # Save the data of total 8 days to images
-for i in range(8): 
-    filepath_flow = pwd + '/Data/{}_flow.xlsx'.format(1014+i)
-    filepath_speed = pwd + '/Data/{}_speed.xlsx'.format(1014+i)
-    filepath_occupancy = pwd + '/Data/{}_occupancy.xlsx'.format(1014+i)       
-    SaveImage(pd.read_excel(filepath_flow),15,GetFlowMatrix,'flow','{}'.format(1014+i))
-    SaveImage(pd.read_excel(filepath_speed),15,GetSpeedMatrix,'speed','{}'.format(1014+i))
-    SaveImage(pd.read_excel(filepath_occupancy),15,GetOccupancyMatrix,'occupancy','{}'.format(1014+i))
+for i in range(7): 
+    filepath_flow = pwd + '/Data/{}_flow.xlsx'.format(1015+i)
+    filepath_speed = pwd + '/Data/{}_speed.xlsx'.format(1015+i)
+    filepath_occupancy = pwd + '/Data/{}_occupancy.xlsx'.format(1015+i)       
+    SaveImage(pd.read_excel(filepath_flow),15,GetFlowMatrix,'flow','{}'.format(1015+i))
+    SaveImage(pd.read_excel(filepath_speed),15,GetSpeedMatrix,'speed','{}'.format(1015+i))
+    SaveImage(pd.read_excel(filepath_occupancy),15,GetOccupancyMatrix,'occupancy','{}'.format(1015+i))
