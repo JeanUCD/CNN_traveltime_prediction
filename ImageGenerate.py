@@ -91,7 +91,7 @@ def SaveImage(df, window_len, GetDataFun, datatype, date):
         window_len: the length of the images(time window)
         GetDataFun: GetFlowMatrix, GetOccupancyMatrix, GetSpeedMatrix
         datatype: flow, occupancy, speed
-        date: 0 for 10/14, 1 for 10/15 .....
+        date: 0 for 10/15, 1 for 10/16 .....
     '''
     mat = GetDataFun(df)
     mat_len = mat.shape[1]
@@ -102,7 +102,7 @@ def SaveImage(df, window_len, GetDataFun, datatype, date):
         scipy.misc.imsave(out_path, mat_window)
 
 pwd = os.path.abspath('.')
-# Save the data of total 8 days to images
+# Save the data of total 7 days to images
 for i in range(7): 
     filepath_flow = pwd + '/Data/{}_flow.xlsx'.format(1015+i)
     filepath_speed = pwd + '/Data/{}_speed.xlsx'.format(1015+i)

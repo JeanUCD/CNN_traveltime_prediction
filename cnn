@@ -33,17 +33,18 @@ data_transform = ToTensor()
 train_data = TTdataset(csv_file=pwd+'/TravelTime/combined_speed.csv', 
                        root_dir = pwd+'/Pics/speed', transform=data_transform)
 
-
+test_data = TTdataset(csv_file=pwd+'/TravelTime/test_data/speed.csv', 
+                       root_dir = pwd+'/Pics/speed', transform=data_transform)
 # Print out some stats about the training and test data
 print('Train data, number of images: ', len(train_data))
-
+print('test data, number of images: ', len(test_data))
 
 # prepare data loaders, set the batch_size
 ## when you get to training your network, see how batch_size affects the loss
 batch_size = 10
 
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
-
+test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
 
 
 ''' Define a CNN '''
@@ -111,7 +112,7 @@ import torch.optim as optim
 
 
 # stochastic gradient descent with a small learning rate
-optimizer = optim.SGD(net.parameters(), lr=0.001)
+optimizer = optim.SGD(net.parameters(), lr=0.01)
 criterion = nn.CrossEntropyLoss()
 '''
 Below, we've defined a `train` function that takes in a number of epochs to train for. 
@@ -161,9 +162,9 @@ def train(n_epochs):
             # to convert loss into a scalar and add it to running_loss, we use .item()
             running_loss += loss.item()
             
-            if batch_i % 130 == 129: # print every 30 batches
-                avg_loss = running_loss/150
-                # record and print the avg loss over the 30 batches
+            if batch_i % 50 == 49: # print every 50 batches
+                avg_loss = running_loss/50
+                # record and print the avg loss over the 50 batches
                 loss_over_time.append(avg_loss)
                 print('Epoch: {}, Batch: {}, Avg. Loss: {}'.format(epoch + 1, batch_i+1, avg_loss))
                 running_loss = 0.0
@@ -172,7 +173,7 @@ def train(n_epochs):
     return loss_over_time
 
 # define the number of epochs to train for
-n_epochs = 100 # start small to see if your model works, initially
+n_epochs = 500 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss = train(n_epochs)
@@ -184,6 +185,31 @@ plt.ylabel('loss')
 #plt.ylim(0, 100000) # consistent scale
 plt.show()
 
+# Calculate accuracy on train_set
+correct = 0
+total = 0
+
+# Iterate through test dataset
+for images, labels in test_loader:
+
+    # forward pass to get outputs
+    # the outputs are a series of class scores
+    outputs = net(images)
+
+    # get the predicted class from the maximum value in the output-list of class scores
+    _, predicted = torch.max(outputs.data, 1)
+
+    # count up total number of correct labels
+    # for which the predicted and true labels are equal
+    total += labels.size(0)
+    correct += (predicted == labels.long()).sum()
+
+# calculate the accuracy
+# to convert `correct` from a Tensor into a scalar, use .item()
+accuracy = 100.0 * correct.item() / total
+
+# print it out!
+print('Accuracy after training: {}%'.format(accuracy))
 
 
 
