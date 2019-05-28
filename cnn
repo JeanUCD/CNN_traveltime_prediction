@@ -24,17 +24,25 @@ import sys
 sys.path.append("..")
 pwd = os.path.abspath('.') 
 
-from GetDataSet import TTdataset,ToTensor
+from GetThreeChannel import TTdataset,ToTensor
 
 ## Define a transform to read the data in as a tensor
 data_transform = ToTensor()
 
 # choose the training and test datasets
-train_data = TTdataset(csv_file=pwd+'/TravelTime/combined_speed.csv', 
-                       root_dir = pwd+'/Pics/speed', transform=data_transform)
+csv_file1=pwd+'/TravelTime/combined_speed.csv'
+csv_file2=pwd+'/TravelTime/combined_flow.csv'
+csv_file3=pwd+'/TravelTime/combined_occupancy.csv'
+root_dir1 = pwd+'/Pics/speed'
+root_dir2 = pwd+'/Pics/flow'
+root_dir3 = pwd+'/Pics/occupancy'
+train_data = TTdataset(csv_file1, csv_file2, csv_file3, root_dir1, root_dir2, root_dir3, transform=data_transform)
 
-test_data = TTdataset(csv_file=pwd+'/TravelTime/test_data/speed.csv', 
-                       root_dir = pwd+'/Pics/speed', transform=data_transform)
+test_csv_file1=pwd+'/TravelTime/test_data/speed.csv'
+test_csv_file2=pwd+'/TravelTime/test_data/flow.csv'
+test_csv_file3=pwd+'/TravelTime/test_data/occupancy.csv'
+test_data = TTdataset(test_csv_file1, test_csv_file2, test_csv_file3, root_dir1, root_dir2, root_dir3, transform=data_transform)
+
 # Print out some stats about the training and test data
 print('Train data, number of images: ', len(train_data))
 print('test data, number of images: ', len(test_data))
@@ -59,7 +67,7 @@ class Net(nn.Module):
         # W: input width, F: kernel_size P: padding S: stride
         # the output Tensor for one image, will have the dimensions: (10, 13, 13)
         # after one pool layer, this becomes (10, 13, 13)
-        self.conv1 = nn.Conv2d(1, 10, 3)
+        self.conv1 = nn.Conv2d(3, 10, 3)
         
         # maxpool layer
         # pool with kernel_size=2, stride=2
@@ -74,12 +82,13 @@ class Net(nn.Module):
          # 20 outputs * the 5*5 filtered/pooled map size
         self.fc1 = nn.Linear(20*5*5, 50)
         
-        # dropout with p=0.4
-        self.fc1_drop = nn.Dropout(p=0.4)
-        
         # finally, create 1 output channel 
-        self.fc2 = nn.Linear(50, 10)
-
+        self.fc2 = nn.Linear(50, 25)
+        
+        # dropout with p=0.5
+        self.fc2_drop = nn.Dropout(p=0.5)
+        
+        self.fc3 = nn.Linear(25, 10)
         
         
 
@@ -96,8 +105,11 @@ class Net(nn.Module):
         
           # two linear layers with dropout in between
         x = F.relu(self.fc1(x))
-        x = self.fc1_drop(x)
-        x = self.fc2(x)
+        x = F.relu(self.fc2(x))
+        x = self.fc2_drop(x)
+        x = self.fc3(x)
+        
+        
       
         # final output
                   
@@ -106,6 +118,29 @@ class Net(nn.Module):
 # instantiate and print your Net
 net = Net().float()
 
+# show the accuracy before training
+total = 0
+correct = 0
+for images, labels in test_loader:
+
+    # forward pass to get outputs
+    # the outputs are a series of class scores
+    outputs = net(images)
+
+    # get the predicted class from the maximum value in the output-list of class scores
+    _, predicted = torch.max(outputs.data, 1)
+
+    # count up total number of correct labels
+    # for which the predicted and true labels are equal
+    total += labels.size(0)
+    correct += (predicted == labels.long()).sum()
+
+# calculate the accuracy
+# to convert `correct` from a Tensor into a scalar, use .item()
+accuracy = 100.0 * correct.item() / total
+
+# print it out!
+print('Accuracy before training: {}%'.format(accuracy))
 
 ''' Train the CNN'''
 import torch.optim as optim
@@ -173,14 +208,14 @@ def train(n_epochs):
     return loss_over_time
 
 # define the number of epochs to train for
-n_epochs = 500 # start small to see if your model works, initially
+n_epochs = 200 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss = train(n_epochs)
 
 # visualize the loss as the network trained
 plt.plot(training_loss)
-plt.xlabel('100\'s of batches')
+plt.xlabel('50\'s of batches')
 plt.ylabel('loss')
 #plt.ylim(0, 100000) # consistent scale
 plt.show()
@@ -199,13 +234,13 @@ for images, labels in test_loader:
     # get the predicted class from the maximum value in the output-list of class scores
     _, predicted = torch.max(outputs.data, 1)
 
-    # count up total number of correct labels
+    # count up total number of correct lTensorabels
     # for which the predicted and true labels are equal
     total += labels.size(0)
     correct += (predicted == labels.long()).sum()
 
 # calculate the accuracy
-# to convert `correct` from a Tensor into a scalar, use .item()
+# to convert `correct` from a  into a scalar, use .item()
 accuracy = 100.0 * correct.item() / total
 
 # print it out!
