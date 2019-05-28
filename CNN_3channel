@@ -83,12 +83,11 @@ class Net(nn.Module):
         self.fc1 = nn.Linear(20*5*5, 50)
         
         # finally, create 1 output channel 
-        self.fc2 = nn.Linear(50, 25)
+        self.fc2 = nn.Linear(50, 10)
         
         # dropout with p=0.5
-        self.fc2_drop = nn.Dropout(p=0.5)
+        self.fc1_drop = nn.Dropout(p=0.5)
         
-        self.fc3 = nn.Linear(25, 10)
         
         
 
@@ -105,9 +104,8 @@ class Net(nn.Module):
         
           # two linear layers with dropout in between
         x = F.relu(self.fc1(x))
-        x = F.relu(self.fc2(x))
-        x = self.fc2_drop(x)
-        x = self.fc3(x)
+        x = self.fc1_drop(x)
+        x = self.fc2(x)
         
         
       
@@ -208,7 +206,7 @@ def train(n_epochs):
     return loss_over_time
 
 # define the number of epochs to train for
-n_epochs = 200 # start small to see if your model works, initially
+n_epochs = 100 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss = train(n_epochs)
