@@ -76,29 +76,32 @@ def SaveTravelTime_withImgName(df,date_index,datatype):
     # link the image path to corresponding travel time to be predicted    
     Image_name = [] 
     for i in range(AggTT.shape[0]):
-        Image_name.append("{}_{}_{}.jpg".format(datatype,1105+date_index,i))
+        Image_name.append("{}_{}_{}.jpg".format(datatype,1015+date_index,i))
     AggTT['Img_name'] = pd.Series(Image_name)
     AggTT = AggTT.dropna(axis = 0, how = "any") # delete data with NAs
-    AggTT.to_csv(pwd+"/TravelTime/test_data/1105/{}_{}.csv".format(datatype, date_index))
+    AggTT.to_csv(pwd+"/TravelTime/{}_{}.csv".format(datatype, date_index))
 
 # Save the csvs
-for i in range(1):
+for i in range(7):
     SaveTravelTime_withImgName(df,i,'flow')
     SaveTravelTime_withImgName(df,i,'speed')
     SaveTravelTime_withImgName(df,i,'occupancy')
+    SaveTravelTime_withImgName(df,i,'observation')
 
 # Get lists of csvs containing same types of data
-all_flow_filenames = [i for i in glob.glob(pwd+'/TravelTime/test_data/1105/flow_*.csv')]
-all_speed_filenames = [i for i in glob.glob(pwd+'/TravelTime/test_data/1105/speed_*.csv')]
-all_occupancy_filenames = [i for i in glob.glob(pwd+'/TravelTime/test_data/1105/occupancy_*.csv')]
+all_flow_filenames = [i for i in glob.glob(pwd+'/TravelTime/flow_*.csv')]
+all_speed_filenames = [i for i in glob.glob(pwd+'/TravelTime/speed_*.csv')]
+all_occupancy_filenames = [i for i in glob.glob(pwd+'/TravelTime/occupancy_*.csv')]
+all_observation_filenames = [i for i in glob.glob(pwd+'/TravelTime/observation_*.csv')]
 
 # Combine all files in the list
 combined_flow_csv = pd.concat([pd.read_csv(f) for f in all_flow_filenames ])
 combined_speed_csv = pd.concat([pd.read_csv(f) for f in all_speed_filenames ])
 combined_occupancy_csv = pd.concat([pd.read_csv(f) for f in all_occupancy_filenames ])
+combined_observation_csv = pd.concat([pd.read_csv(f) for f in all_observation_filenames ])
 
 # Export to csv
-combined_flow_csv.to_csv( pwd+"/TravelTime/test_data/1105/combined_flow.csv", index=False, encoding='utf-8-sig')
-combined_speed_csv.to_csv( pwd+"/TravelTime/test_data/1105/combined_speed.csv", index=False, encoding='utf-8-sig')
-combined_occupancy_csv.to_csv( pwd+"/TravelTime/test_data/1105/combined_occupancy.csv", index=False, encoding='utf-8-sig')
-
+combined_flow_csv.to_csv( pwd+"/TravelTime/combined_flow.csv", index=False, encoding='utf-8-sig')
+combined_speed_csv.to_csv( pwd+"/TravelTime/combined_speed.csv", index=False, encoding='utf-8-sig')
+combined_occupancy_csv.to_csv( pwd+"/TravelTime/combined_occupancy.csv", index=False, encoding='utf-8-sig')
+combined_observation_csv.to_csv( pwd+"/TravelTime/combined_observation.csv", index=False, encoding='utf-8-sig')

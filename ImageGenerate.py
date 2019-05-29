@@ -80,7 +80,25 @@ def GetSpeedMatrix(df):
     Frame = np.delete(Frame,(0),axis=0)
     return Frame
 
-
+def GetObRateMatrix(df):
+    '''
+    Get the data matrix of observation rate of the 15 VDSs
+            t    t+5min  t+10min   ....
+    VDS1    
+    VDS2
+    ....
+    VDS15  
+    '''
+    
+    nrow = df.shape[0]
+    VDS_list = df.VDS.unique()
+    Frame = np.zeros(shape = (1,int(nrow/len(VDS_list))))
+    for i in range(len(VDS_list)):
+        VDS_data = df[df.VDS==VDS_list[i]]['% Observed'].fillna(method='pad').as_matrix().reshape(1,-1)
+        Frame = np.concatenate((Frame,VDS_data), axis=0)
+    Frame = np.delete(Frame,(0),axis=0)
+    return Frame
+    
 def SaveImage(df, window_len, GetDataFun, datatype, date):
     '''
     Save images by datatype(flow/occupancy/speed) and date(10/14,10/15...)
@@ -111,3 +129,4 @@ for i in range(7):
     SaveImage(pd.read_excel(filepath_flow),15,GetFlowMatrix,'flow','{}'.format(date))
     SaveImage(pd.read_excel(filepath_speed),15,GetSpeedMatrix,'speed','{}'.format(date))
     SaveImage(pd.read_excel(filepath_occupancy),15,GetOccupancyMatrix,'occupancy','{}'.format(date))
+    SaveImage(pd.read_excel(filepath_speed),15,GetObRateMatrix,'observation','{}'.format(date))
