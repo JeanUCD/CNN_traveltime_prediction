@@ -38,9 +38,9 @@ root_dir2 = pwd+'/Pics/flow'
 root_dir3 = pwd+'/Pics/occupancy'
 train_data = TTdataset(csv_file1, csv_file2, csv_file3, root_dir1, root_dir2, root_dir3, transform=data_transform)
 
-test_csv_file1=pwd+'/TravelTime/test_data/1014/speed.csv'
-test_csv_file2=pwd+'/TravelTime/test_data/1014/flow.csv'
-test_csv_file3=pwd+'/TravelTime/test_data/1014/occupancy.csv'
+test_csv_file1=pwd+'/TravelTime/test_data/1030/speed.csv'
+test_csv_file2=pwd+'/TravelTime/test_data/1030/flow.csv'
+test_csv_file3=pwd+'/TravelTime/test_data/1030/occupancy.csv'
 test_data = TTdataset(test_csv_file1, test_csv_file2, test_csv_file3, root_dir1, root_dir2, root_dir3, transform=data_transform)
 
 # Print out some stats about the training and test data
@@ -233,7 +233,7 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy
 
 # define the number of epochs to train for
-n_epochs = 100 # start small to see if your model works, initially
+n_epochs = 20 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss, test_loss, accuracy_on_testset = train(n_epochs,net)

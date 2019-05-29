@@ -30,14 +30,27 @@ from GetFourChannel import TTdataset,ToTensor
 data_transform = ToTensor()
 
 # choose the training and test datasets
+csv_file1=pwd+'/TravelTime/combined_speed.csv'
+csv_file2=pwd+'/TravelTime/combined_flow.csv'
+csv_file3=pwd+'/TravelTime/combined_occupancy.csv'
+csv_file4=pwd+'/TravelTime/combined_observation.csv'
 
-test_csv_file1=pwd+'/TravelTime/test_data/1014/speed.csv'
-test_csv_file2=pwd+'/TravelTime/test_data/1014/flow.csv'
-test_csv_file3=pwd+'/TravelTime/test_data/1014/occupancy.csv'
-test_data = TTdataset(test_csv_file1, test_csv_file2, test_csv_file3, root_dir1, root_dir2, root_dir3, transform=data_transform)
+test_csv_file1=pwd+'/TravelTime/test_data/1030/speed.csv'
+test_csv_file2=pwd+'/TravelTime/test_data/1030/flow.csv'
+test_csv_file3=pwd+'/TravelTime/test_data/1030/occupancy.csv'
+test_csv_file4=pwd+'/TravelTime/test_data/1030/observation.csv'
+
+
+root_dir1 = pwd+'/Pics/speed'
+root_dir2 = pwd+'/Pics/flow'
+root_dir3 = pwd+'/Pics/occupancy'
+root_dir4 = pwd+'/Pics/observation'
+
+train_data = TTdataset(csv_file1, csv_file2, csv_file3, csv_file4, root_dir1, root_dir2, root_dir3,root_dir4, transform=data_transform)
+test_data = TTdataset(test_csv_file1, test_csv_file2, test_csv_file3,test_csv_file4, root_dir1, root_dir2, root_dir3,root_dir4, transform=data_transform)
 
 # Print out some stats about the training and test data
-print('Train data, number of images: ', len(train_data)
+print('Train data, number of images: ', len(train_data))
 print('test data, number of images: ', len(test_data))
 
 # prepare data loaders, set the batch_size

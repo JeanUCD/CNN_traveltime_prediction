@@ -121,7 +121,7 @@ def SaveImage(df, window_len, GetDataFun, datatype, date):
 
 pwd = os.path.abspath('.')
 # Save the data of total 7 days to images
-for i in range(7): 
+for i in range(17): 
     date = 1015 + i
     filepath_flow = pwd + '/Data/{}_flow.xlsx'.format(date)
     filepath_speed = pwd + '/Data/{}_speed.xlsx'.format(date)

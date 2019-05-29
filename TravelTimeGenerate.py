@@ -70,8 +70,10 @@ def SaveTravelTime_withImgName(df,date_index,datatype):
     # fill 0 with mean
     AggTT.TravelTime[AggTT.TravelTime == 0] = AggTT.TravelTime.mean()
     # convert regression to classification
-    AggTT.TravelTime[AggTT.TravelTime <= 700] = (AggTT.TravelTime - 420)//30
-    AggTT.TravelTime[AggTT.TravelTime > 700] = 9
+    AggTT.TravelTime[AggTT.TravelTime <= 749] = (AggTT.TravelTime - 450)//30
+    AggTT.TravelTime[AggTT.TravelTime > 749] = 9
+    list1 = [0 if i < 0 else i for i in AggTT.TravelTime]
+    AggTT.TravelTime = list1
   
     # link the image path to corresponding travel time to be predicted    
     Image_name = [] 
@@ -82,7 +84,7 @@ def SaveTravelTime_withImgName(df,date_index,datatype):
     AggTT.to_csv(pwd+"/TravelTime/{}_{}.csv".format(datatype, date_index))
 
 # Save the csvs
-for i in range(7):
+for i in range(17):
     SaveTravelTime_withImgName(df,i,'flow')
     SaveTravelTime_withImgName(df,i,'speed')
     SaveTravelTime_withImgName(df,i,'occupancy')
