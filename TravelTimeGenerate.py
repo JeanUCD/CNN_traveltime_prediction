@@ -78,7 +78,7 @@ def SaveTravelTime_withImgName(df,date_index,datatype):
     # link the image path to corresponding travel time to be predicted    
     Image_name = [] 
     for i in range(AggTT.shape[0]):
-        Image_name.append("{}_{}_{}.jpg".format(datatype,1015+date_index,i))
+        Image_name.append("{}_{}_{}.jpg".format(datatype,1105+date_index,i))
     AggTT['Img_name'] = pd.Series(Image_name)
     AggTT = AggTT.dropna(axis = 0, how = "any") # delete data with NAs
     AggTT.to_csv(pwd+"/TravelTime/{}_{}.csv".format(datatype, date_index))

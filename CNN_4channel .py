@@ -35,10 +35,10 @@ csv_file2=pwd+'/TravelTime/combined_flow.csv'
 csv_file3=pwd+'/TravelTime/combined_occupancy.csv'
 csv_file4=pwd+'/TravelTime/combined_observation.csv'
 
-test_csv_file1=pwd+'/TravelTime/test_data/1031/speed.csv'
-test_csv_file2=pwd+'/TravelTime/test_data/1031/flow.csv'
-test_csv_file3=pwd+'/TravelTime/test_data/1031/occupancy.csv'
-test_csv_file4=pwd+'/TravelTime/test_data/1031/observation.csv'
+test_csv_file1=pwd+'/TravelTime/test_data/1105/speed.csv'
+test_csv_file2=pwd+'/TravelTime/test_data/1105/flow.csv'
+test_csv_file3=pwd+'/TravelTime/test_data/1105/occupancy.csv'
+test_csv_file4=pwd+'/TravelTime/test_data/1105/observation.csv'
 
 
 root_dir1 = pwd+'/Pics/speed'
@@ -239,7 +239,7 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy
 
 # define the number of epochs to train for
-n_epochs = 500 # start small to see if your model works, initially
+n_epochs = 20 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss, test_loss, accuracy_on_testset = train(n_epochs,net)
