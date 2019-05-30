@@ -1,10 +1,16 @@
 # -*- coding: utf-8 -*-
 """
+Created on Wed May 29 12:41:14 2019
+
+@author: jean
+"""
+
+# -*- coding: utf-8 -*-
+"""
 Created on Fri May 24 20:41:08 2019
 
 @author: jean
 """
-from __future__ import print_function, division
 import os
 import torch
 import pandas as pd
@@ -24,7 +30,7 @@ pwd = os.path.abspath('.')
 class TTdataset(Dataset):
     """Travel Time dataset."""
 
-    def __init__(self, csv_file1, csv_file2, csv_file3, csv_file4, root_dir1, root_dir2, root_dir3, root_dir4,transform=None):
+    def __init__(self, csv_file1, csv_file2, csv_file3, csv_file4, root_dir1, root_dir2, root_dir3, root_dir4, transform=None):
         """
         Args:
             csv_file (string): Path to the csv file with annotations.

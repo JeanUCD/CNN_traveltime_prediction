@@ -13,7 +13,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 
-# data loading and transforming
+# data loading and transforming 
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
@@ -24,7 +24,7 @@ import sys
 sys.path.append("..")
 pwd = os.path.abspath('.') 
 
-from GetFourChannel import TTdataset,ToTensor
+from GetChannel import TTdataset,ToTensor
 
 ## Define a transform to read the data in as a tensor
 data_transform = ToTensor()
@@ -35,10 +35,10 @@ csv_file2=pwd+'/TravelTime/combined_flow.csv'
 csv_file3=pwd+'/TravelTime/combined_occupancy.csv'
 csv_file4=pwd+'/TravelTime/combined_observation.csv'
 
-test_csv_file1=pwd+'/TravelTime/test_data/1030/speed.csv'
-test_csv_file2=pwd+'/TravelTime/test_data/1030/flow.csv'
-test_csv_file3=pwd+'/TravelTime/test_data/1030/occupancy.csv'
-test_csv_file4=pwd+'/TravelTime/test_data/1030/observation.csv'
+test_csv_file1=pwd+'/TravelTime/test_data/1031/speed.csv'
+test_csv_file2=pwd+'/TravelTime/test_data/1031/flow.csv'
+test_csv_file3=pwd+'/TravelTime/test_data/1031/occupancy.csv'
+test_csv_file4=pwd+'/TravelTime/test_data/1031/observation.csv'
 
 
 root_dir1 = pwd+'/Pics/speed'
@@ -55,7 +55,7 @@ print('test data, number of images: ', len(test_data))
 
 # prepare data loaders, set the batch_size
 ## when you get to training your network, see how batch_size affects the loss
-batch_size = 10
+batch_size = 25
 
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
@@ -73,7 +73,7 @@ class Net(nn.Module):
         # W: input width, F: kernel_size P: padding S: stride
         # the output Tensor for one image, will have the dimensions: (10, 13, 13)
         # after one pool layer, this becomes (10, 13, 13)
-        self.conv1 = nn.Conv2d(3, 10, 3)
+        self.conv1 = nn.Conv2d(4, 10, 3)
         
         # maxpool layer
         # pool with kernel_size=2, stride=2
@@ -239,7 +239,7 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy
 
 # define the number of epochs to train for
-n_epochs = 100 # start small to see if your model works, initially
+n_epochs = 500 # start small to see if your model works, initially
 
 # call train and record the loss over time
 training_loss, test_loss, accuracy_on_testset = train(n_epochs,net)
