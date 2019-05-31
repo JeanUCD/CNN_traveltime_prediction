@@ -11,13 +11,17 @@ Use *ImageGenerate.py* (already generated into ./Pics)
 Use *TravelTimeGenerate.py* (already generated into ./TravelTime, 4 days' test data in /test_data)
 
 ## Generate Pytorch training data sets
-Use *GetOneChannel.py* for One Channel CNN (speed/flow/occupancy)
-Use *GetThreeChannel.py* for Three Channels CNN (speed+flow+occupancy)
+Use *GetOneChannel.py* for One Channel CNN (speed/flow/occupancy)  
+
+Use *GetThreeChannel.py* for Three Channels CNN (speed+flow+occupancy)  
+
 Use *GetChannel.py* for Four Channels CNN (speed+flow+occupancy+observation rate)
 
 ## Train CNNs
-Use *CNN_1channel.py* for One Channel CNN (speed/flow/occupancy)
-Use *CNN_3channel.py* for Three Channels CNN (speed+flow+occupancy)
+Use *CNN_1channel.py* for One Channel CNN (speed/flow/occupancy)  
+
+Use *CNN_3channel.py* for Three Channels CNN (speed+flow+occupancy)  
+
 Use *CNN_4channel.py* for Four Channels CNN (speed+flow+occupancy+observation rate)
 
 ## Outputs
