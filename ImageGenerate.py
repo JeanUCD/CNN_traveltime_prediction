@@ -6,7 +6,7 @@ Created on Mon May 20 10:55:44 2019
 """
 """
 Generate images from PeMS data
-Convert flow rate/speed/occupancy data to images as:
+Convert flow rate/speed/occupancy/observation rate data to images as:
 
        t     t+5min    t+10min   ....   ....  t+5min*window_len     
 VDS1  f/s/o   f/s/o     f/s/o                  f/s/o

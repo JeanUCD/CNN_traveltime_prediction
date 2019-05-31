@@ -6,18 +6,16 @@ Created on Fri May 10 21:26:55 2019
 @author: jean
 """
 ''' import dataset'''
-# our basic libraries
+# import basic libraries
 import torch
-import torchvision
 import torch.nn as nn
 import torch.nn.functional as F
+import matplotlib.pyplot as plt
+import pandas as pd
 
 
 # data loading and transforming
 from torch.utils.data import DataLoader
-import numpy as np
-import matplotlib.pyplot as plt
-import pandas as pd
 
 import os
 import sys
@@ -51,7 +49,6 @@ print('Train data, number of images: ', len(train_data))
 print('test data, number of images: ', len(test_data))
 
 # prepare data loaders, set the batch_size
-## when you get to training your network, see how batch_size affects the loss
 batch_size = 10
 
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
@@ -64,7 +61,7 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         
-        # 1 input image channel (grayscale), 10 output channels/feature maps
+        # 3 input image channels (speed,flow,occupancy), 10 output channels/feature maps
         # 3x3 square convolution kernel
         ## output size = (W-F+2*P)/S +1 = (15-3)/1 +1 = 13
         # W: input width, F: kernel_size P: padding S: stride
@@ -82,7 +79,7 @@ class Net(nn.Module):
         # after another pool layer this becomes (20, 5, 5); 5.5 is rounded down
         self.conv2 = nn.Conv2d(10, 20, 3)
         
-         # 20 outputs * the 5*5 filtered/pooled map size
+         # 50 outputs * the 5*5 filtered/pooled map size
         self.fc1 = nn.Linear(20*5*5, 50)
         
         # finally, create 1 output channel 
@@ -114,9 +111,16 @@ class Net(nn.Module):
                   
         return x
 
-
+# define a function to return the cross entropy loss on test set and prediction accuracy
 def AccuTest(model,test_loader,criterion):
     '''Return the loss on test set and the prediction accuracy'''
+    '''
+    Params
+    ------
+        model: CNN Net
+        test_loader: test_loader
+        criterion: function used for calculating error
+    '''
     correct = 0
     total = 0
     accuracy = 0
@@ -155,7 +159,7 @@ def AccuTest(model,test_loader,criterion):
     
     return test_loss, accuracy
     
-# instantiate and print your Net
+# instantiate the Net
 net = Net().float()
 
 import torch.optim as optim
@@ -173,7 +177,7 @@ print('Accuracy before training: {}%'.format(accuracy0))
 '''
 Below, we've defined a `train` function that takes in a number of epochs to train for. 
 * The number of epochs is how many times a network will cycle through the entire training dataset. 
-* Inside the epoch loop, we loop over the training dataset in batches; recording the loss every 1000 batches.
+* Inside the epoch loop, we loop over the training dataset in batches; recording the loss every 50 batches.
 
 Here are the steps that this training function performs as it iterates over the training dataset:
 
@@ -189,9 +193,9 @@ Here are the steps that this training function performs as it iterates over the 
 def train(n_epochs, model):
     
     loss_over_time = [] # to track the loss as the network trains
-    test_loss = []
-    accuracy_test = []
-    accuracy_train = []
+    test_loss = [] # to track the loss on test set every epoch
+    accuracy_test = [] # to track the prediction accuracy on test set
+    accuracy_train = [] # to track the prediction accuracy on training set
     accuracy_test.append(accuracy0)
     # switch to the training model
     model.train()
@@ -239,11 +243,12 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy_test,accuracy_train
 
 # define the number of epochs to train for
-n_epochs = 500 # start small to see if your model works, initially
+n_epochs = 500 
 
-# call train and record the loss over time
+# call train and record the loss and accuracy over time
 training_loss, test_loss, accuracy_test, accuracy_train = train(n_epochs,net)
 
+# save the results to csvs
 pd.DataFrame(training_loss).to_csv(pwd+"/outputs/Channel3/training_loss/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
 pd.DataFrame(test_loss).to_csv(pwd+"/outputs/Channel3/test_loss/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
 pd.DataFrame(accuracy_train).to_csv(pwd+"/outputs/Channel3/acc_train/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
@@ -253,7 +258,6 @@ pd.DataFrame(accuracy_test).to_csv(pwd+"/outputs/Channel3/acc_test/{}epochs_{}ba
 plt.plot(training_loss)
 plt.xlabel('50\'s of batches')
 plt.ylabel('loss')
-#plt.ylim(0, 100000) # consistent scale
 plt.show()
 
 

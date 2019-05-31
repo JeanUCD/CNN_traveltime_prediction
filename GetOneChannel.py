@@ -10,8 +10,7 @@ import torch
 import pandas as pd
 from skimage import io, transform
 import numpy as np
-import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from torchvision import transforms, utils
 
 # Ignore warnings
@@ -45,9 +44,6 @@ class TTdataset(Dataset):
         # Normalize the pixel values to [0,1]
         image = io.imread(img_name)/255
         traveltime = self.traveltime_frame.iloc[idx, 1]
-          # one-hot encoding
-        TT_onehot = np.zeros((1,10))
-        TT_onehot[0,int(traveltime)] = 1
         sample = {'image': image, 'traveltime': traveltime}
 
         if self.transform:

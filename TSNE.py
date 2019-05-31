@@ -5,13 +5,8 @@ Created on Thu May 30 22:13:30 2019
 @author: jean
 """
 import torch
-import torchvision
-import torch.nn as nn
 import torch.nn.functional as F
 import matplotlib.pyplot as plt
-
-# data loading and transforming
-from torch.utils.data import DataLoader
 import numpy as np
 from tsne import bh_sne
 

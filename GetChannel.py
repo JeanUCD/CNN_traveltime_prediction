@@ -17,7 +17,7 @@ import pandas as pd
 from skimage import io, transform
 import numpy as np
 import matplotlib.pyplot as plt
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from torchvision import transforms, utils
 
 # Ignore warnings
@@ -66,9 +66,6 @@ class TTdataset(Dataset):
         image3 = io.imread(img_name3)/255
         image4 = io.imread(img_name4)/255        
         traveltime = self.traveltime_frame1.iloc[idx, 1]
-          # one-hot encoding
-        TT_onehot = np.zeros((1,10))
-        TT_onehot[0,int(traveltime)] = 1
         image = np.array([[image1,image2,image3,image4]])
         sample = {'image': image, 'traveltime': traveltime}
 
