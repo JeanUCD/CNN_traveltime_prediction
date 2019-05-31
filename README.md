@@ -2,7 +2,7 @@
 ### Use Convolutional Neural Network to predict travel time on I-80E from Davis to West Sacramento
 
 ## Data 
-see ./Data/Data Fact.pdf
+see [Data Fact](https://github.com/JeanUCD/CNN_traveltime_prediction/blob/master/Data/Data%20Fact.docx)
 
 ## Generate images from traffic data
 Use *ImageGenerate.py* (already generated into ./Pics)
