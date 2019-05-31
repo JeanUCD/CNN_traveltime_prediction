@@ -17,6 +17,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import os
 import sys
@@ -35,10 +36,11 @@ csv_file2=pwd+'/TravelTime/combined_flow.csv'
 csv_file3=pwd+'/TravelTime/combined_occupancy.csv'
 csv_file4=pwd+'/TravelTime/combined_observation.csv'
 
-test_csv_file1=pwd+'/TravelTime/test_data/1105/speed.csv'
-test_csv_file2=pwd+'/TravelTime/test_data/1105/flow.csv'
-test_csv_file3=pwd+'/TravelTime/test_data/1105/occupancy.csv'
-test_csv_file4=pwd+'/TravelTime/test_data/1105/observation.csv'
+test_date = 1105
+test_csv_file1=pwd+'/TravelTime/test_data/{}/speed.csv'.format(test_date)
+test_csv_file2=pwd+'/TravelTime/test_data/{}/flow.csv'.format(test_date)
+test_csv_file3=pwd+'/TravelTime/test_data/{}/occupancy.csv'.format(test_date)
+test_csv_file4=pwd+'/TravelTime/test_data/{}/observation.csv'.format(test_date)
 
 
 root_dir1 = pwd+'/Pics/speed'
@@ -55,7 +57,7 @@ print('test data, number of images: ', len(test_data))
 
 # prepare data loaders, set the batch_size
 ## when you get to training your network, see how batch_size affects the loss
-batch_size = 25
+batch_size = 10
 
 train_loader = DataLoader(train_data, batch_size=batch_size, shuffle=True)
 test_loader = DataLoader(test_data, batch_size=batch_size, shuffle=True)
@@ -163,7 +165,8 @@ net = Net().float()
 
 import torch.optim as optim
 # stochastic gradient descent with a small learning rate
-optimizer = optim.SGD(net.parameters(), lr=0.01)
+learning_rate = 0.01
+optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 criterion = nn.CrossEntropyLoss()
 # show the accuracy before training
 _,accuracy0 = AccuTest(net,train_loader,criterion)
@@ -192,8 +195,9 @@ def train(n_epochs, model):
     
     loss_over_time = [] # to track the loss as the network trains
     test_loss = []
-    accuracy = []
-    accuracy.append(accuracy0)
+    accuracy_test = []
+    accuracy_train = []
+    accuracy_test.append(accuracy0)
     # switch to the training model
     model.train()
     
@@ -231,18 +235,24 @@ def train(n_epochs, model):
                 print('Epoch: {}, Batch: {}, Avg. Loss: {}'.format(epoch + 1, batch_i+1, avg_loss))
                 running_loss = 0.0
                 
-        test_loss_epoch,accuracy_epoch = AccuTest(model,test_loader,criterion)
-        
+        test_loss_epoch,accuracy_test_epoch = AccuTest(model,test_loader,criterion)
+        _,accuracy_train_epoch = AccuTest(model,train_loader,criterion)
         test_loss.append(test_loss_epoch)
-        accuracy.append(accuracy_epoch)
+        accuracy_test.append(accuracy_test_epoch)
+        accuracy_train.append(accuracy_train_epoch)
     print('Finished Training')
-    return loss_over_time,test_loss,accuracy
+    return loss_over_time,test_loss,accuracy_test,accuracy_train
 
 # define the number of epochs to train for
-n_epochs = 20 # start small to see if your model works, initially
+n_epochs = 500 # start small to see if your model works, initially
 
 # call train and record the loss over time
-training_loss, test_loss, accuracy_on_testset = train(n_epochs,net)
+training_loss, test_loss, accuracy_test, accuracy_train = train(n_epochs,net)
+
+pd.DataFrame(training_loss).to_csv(pwd+"/outputs/Channel4/training_loss/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
+pd.DataFrame(test_loss).to_csv(pwd+"/outputs/Channel4/test_loss/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
+pd.DataFrame(accuracy_train).to_csv(pwd+"/outputs/Channel4/acc_train/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
+pd.DataFrame(accuracy_test).to_csv(pwd+"/outputs/Channel4/acc_test/{}epochs_{}batchsize_{}lr_teston{}.csv".format(n_epochs,batch_size,learning_rate,test_date))
 
 # visualize the loss as the network trained
 plt.plot(training_loss)

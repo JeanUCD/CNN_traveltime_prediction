@@ -17,6 +17,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader
 import numpy as np
 import matplotlib.pyplot as plt
+import pandas as pd
 
 import os
 import sys
@@ -30,11 +31,14 @@ from GetOneChannel import TTdataset,ToTensor
 data_transform = ToTensor()
 
 # choose the training and test datasets
-csv_file=pwd+'/TravelTime/combined_speed.csv'
-root_dir = pwd+'/Pics/speed'
+datatype = 'occupancy'
+test_date = 1030
+
+csv_file=pwd+'/TravelTime/combined_{}.csv'.format(datatype)
+root_dir = pwd+'/Pics/{}'.format(datatype)
 train_data = TTdataset(csv_file, root_dir,transform=data_transform)
 
-test_csv_file=pwd+'/TravelTime/test_data/speed.csv'
+test_csv_file=pwd+'/TravelTime/test_data/{}/{}.csv'.format(test_date,datatype)
 test_data = TTdataset(test_csv_file, root_dir, transform=data_transform)
 
 # Print out some stats about the training and test data
@@ -61,7 +65,7 @@ class Net(nn.Module):
         # W: input width, F: kernel_size P: padding S: stride
         # the output Tensor for one image, will have the dimensions: (10, 13, 13)
         # after one pool layer, this becomes (10, 13, 13)
-        self.conv1 = nn.Conv2d(3, 10, 3)
+        self.conv1 = nn.Conv2d(1, 10, 3)
         
         # maxpool layer
         # pool with kernel_size=2, stride=2
@@ -110,37 +114,57 @@ class Net(nn.Module):
 # instantiate and print your Net
 net = Net().float()
 
-# show the accuracy before training
-total = 0
-correct = 0
-for images, labels in test_loader:
+def AccuTest(model,test_loader,criterion):
+    '''Return the loss on test set and the prediction accuracy'''
+    correct = 0
+    total = 0
+    accuracy = 0
+    # initialize tensor and lists to monitor test loss and accuracy
+    test_loss = torch.zeros(1)
 
-    # forward pass to get outputs
-    # the outputs are a series of class scores
-    outputs = net(images)
+    # set the module to evaluation mode
+    model.eval()
 
-    # get the predicted class from the maximum value in the output-list of class scores
-    _, predicted = torch.max(outputs.data, 1)
+    for batch_i, data in enumerate(test_loader):
+    
+        # get the input images and their corresponding labels
+        inputs, labels = data
+    
+        # forward pass to get outputs
+        outputs = model(inputs)
 
-    # count up total number of correct labels
-    # for which the predicted and true labels are equal
-    total += labels.size(0)
-    correct += (predicted == labels.long()).sum()
+        # calculate the loss
+        loss = criterion(outputs, labels.long())
+            
+        # update average test loss 
+        test_loss = test_loss + ((torch.ones(1) / (batch_i + 1)) * (loss.data - test_loss))
+    
+        # get the predicted class from the maximum value in the output-list of class scores
+        _, predicted = torch.max(outputs.data, 1)
 
-# calculate the accuracy
-# to convert `correct` from a Tensor into a scalar, use .item()
-accuracy = 100.0 * correct.item() / total
+        # count up total number of correct lTensorabels
+        # for which the predicted and true labels are equal
+        total += labels.size(0)
+        #correct += ((predicted == labels.long()).sum() + 
+                    #(predicted == (labels.long()+1)).sum() + (predicted == (labels.long()-1)).sum())
+        correct += (predicted == labels.long()).sum()
+    # to convert `correct` from a  into a scalar, use .item()
+    accuracy = 100.0 * correct.item() / total
+    test_loss = test_loss.numpy()[0]
+    
+    return test_loss, accuracy
+    
 
-# print it out!
-print('Accuracy before training: {}%'.format(accuracy))
 
 ''' Train the CNN'''
 import torch.optim as optim
 
 
 # stochastic gradient descent with a small learning rate
-optimizer = optim.SGD(net.parameters(), lr=0.01)
+learning_rate = 0.01
+optimizer = optim.SGD(net.parameters(), lr=learning_rate)
 criterion = nn.CrossEntropyLoss()
+_,accuracy0 = AccuTest(net,train_loader,criterion)
 '''
 Below, we've defined a `train` function that takes in a number of epochs to train for. 
 * The number of epochs is how many times a network will cycle through the entire training dataset. 
@@ -157,10 +181,15 @@ Here are the steps that this training function performs as it iterates over the 
 
 '''
 
-def train(n_epochs):
+def train(n_epochs, model):
     
     loss_over_time = [] # to track the loss as the network trains
+    test_loss = []
+    accuracy_test = []
+    accuracy_train = []
+    accuracy_test.append(accuracy0)
     
+    model.train()
     
     for epoch in range(n_epochs):  # loop over the dataset multiple times
         
@@ -195,15 +224,24 @@ def train(n_epochs):
                 loss_over_time.append(avg_loss)
                 print('Epoch: {}, Batch: {}, Avg. Loss: {}'.format(epoch + 1, batch_i+1, avg_loss))
                 running_loss = 0.0
-
+        test_loss_epoch,accuracy_test_epoch = AccuTest(model,test_loader,criterion)
+        _,accuracy_train_epoch = AccuTest(model,train_loader,criterion)
+        test_loss.append(test_loss_epoch)
+        accuracy_test.append(accuracy_test_epoch)
+        accuracy_train.append(accuracy_train_epoch)
     print('Finished Training')
-    return loss_over_time
+    return loss_over_time,test_loss,accuracy_test,accuracy_train
 
 # define the number of epochs to train for
-n_epochs = 100 # start small to see if your model works, initially
+n_epochs = 500 # start small to see if your model works, initially
 
 # call train and record the loss over time
-training_loss = train(n_epochs)
+training_loss, test_loss, accuracy_test, accuracy_train = train(n_epochs,net)
+
+pd.DataFrame(training_loss).to_csv(pwd+"/outputs/Channel1/{}/training_loss/{}epochs_{}batchsize_{}lr_teston{}.csv".format(datatype,n_epochs,batch_size,learning_rate,test_date))
+pd.DataFrame(test_loss).to_csv(pwd+"/outputs/Channel1/{}/test_loss/{}epochs_{}batchsize_{}lr_teston{}.csv".format(datatype,n_epochs,batch_size,learning_rate,test_date))
+pd.DataFrame(accuracy_train).to_csv(pwd+"/outputs/Channel1/{}/acc_train/{}epochs_{}batchsize_{}lr_teston{}.csv".format(datatype,n_epochs,batch_size,learning_rate,test_date))
+pd.DataFrame(accuracy_test).to_csv(pwd+"/outputs/Channel1/{}/acc_test/{}epochs_{}batchsize_{}lr_teston{}.csv".format(datatype,n_epochs,batch_size,learning_rate,test_date))
 
 # visualize the loss as the network trained
 plt.plot(training_loss)
@@ -212,31 +250,7 @@ plt.ylabel('loss')
 #plt.ylim(0, 100000) # consistent scale
 plt.show()
 
-# Calculate accuracy on train_set
-correct = 0
-total = 0
 
-# Iterate through test dataset
-for images, labels in test_loader:
-
-    # forward pass to get outputs
-    # the outputs are a series of class scores
-    outputs = net(images)
-
-    # get the predicted class from the maximum value in the output-list of class scores
-    _, predicted = torch.max(outputs.data, 1)
-
-    # count up total number of correct lTensorabels
-    # for which the predicted and true labels are equal
-    total += labels.size(0)
-    correct += (predicted == labels.long()).sum()
-
-# calculate the accuracy
-# to convert `correct` from a  into a scalar, use .item()
-accuracy = 100.0 * correct.item() / total
-
-# print it out!
-print('Accuracy after training: {}%'.format(accuracy))
 
 
 
