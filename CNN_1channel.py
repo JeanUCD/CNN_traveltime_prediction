@@ -29,7 +29,7 @@ from GetOneChannel import TTdataset,ToTensor
 data_transform = ToTensor()
 
 # choose the training and test datasets
-datatype = 'occupancy'
+datatype = 'flow'
 test_date = 1030
 
 csv_file=pwd+'/TravelTime/combined_{}.csv'.format(datatype)
@@ -99,7 +99,7 @@ class Net(nn.Module):
         
         # two linear layers with dropout in between
         x = F.relu(self.fc1(x))
-        x = self.fc1_drop(x)
+        #x = self.fc1_drop(x)
         x = self.fc2(x)
     
         # final output
@@ -238,7 +238,7 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy_test,accuracy_train
 
 # define the number of epochs to train for
-n_epochs = 500 
+n_epochs = 501
 
 # call train and record the loss and accuracy over time
 training_loss, test_loss, accuracy_test, accuracy_train = train(n_epochs,net)

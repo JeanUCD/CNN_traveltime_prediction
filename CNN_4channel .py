@@ -34,7 +34,7 @@ csv_file2=pwd+'/TravelTime/combined_flow.csv'
 csv_file3=pwd+'/TravelTime/combined_occupancy.csv'
 csv_file4=pwd+'/TravelTime/combined_observation.csv'
 
-test_date = 1105
+test_date = 1031
 test_csv_file1=pwd+'/TravelTime/test_data/{}/speed.csv'.format(test_date)
 test_csv_file2=pwd+'/TravelTime/test_data/{}/flow.csv'.format(test_date)
 test_csv_file3=pwd+'/TravelTime/test_data/{}/occupancy.csv'.format(test_date)
