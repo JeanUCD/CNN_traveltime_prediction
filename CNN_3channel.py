@@ -149,12 +149,13 @@ def AccuTest(model,test_loader,criterion):
 
         # count up total number of correct lTensorabels
         # for which the predicted and true labels are equal
-        total += labels.size(0)
-        #correct += ((predicted == labels.long()).sum() + 
-                    #(predicted == (labels.long()+1)).sum() + (predicted == (labels.long()-1)).sum())
-        correct += (predicted == labels.long()).sum()
+        #total += labels.size(0)
+        #correct += (predicted == labels.long()).sum()
+        total += labels.size(0)*9
+        correct += abs(predicted - labels.long()).sum()         
     # to convert `correct` from a  into a scalar, use .item()
-    accuracy = 100.0 * correct.item() / total
+    #accuracy = 100.0 * correct.item() / total
+    accuracy = 100.0 * (1-correct.item() / total)    
     test_loss = test_loss.numpy()[0]
     
     return test_loss, accuracy
@@ -243,7 +244,7 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy_test,accuracy_train
 
 # define the number of epochs to train for
-n_epochs = 500
+n_epochs = 200
 
 # call train and record the loss and accuracy over time
 training_loss, test_loss, accuracy_test, accuracy_train = train(n_epochs,net)
