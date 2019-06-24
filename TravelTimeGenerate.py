@@ -21,6 +21,7 @@ def GetTravelTime_by5min(df,date_index):
         df: pandas dataframe of the traveltime data
         date_index: 0 for 10/15/2018, 1 for 10/16/2018...
     '''
+    date_index = 0
     date_list = df.date.unique() # classify data by date
     segment_list = df.segment.unique()[0:3] # we just select the 3 segments esatbound
     df = df[df.date == date_list[date_index]] # choose the data of date_index

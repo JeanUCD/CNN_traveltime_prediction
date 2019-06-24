@@ -9,13 +9,13 @@ Generate images from PeMS data
 Convert flow rate/speed/occupancy/observation rate data to images as:
 
        t     t+5min    t+10min   ....   ....  t+5min*window_len     
-VDS1  f/s/o   f/s/o     f/s/o                  f/s/o
-VDS2  f/s/o   f/s/o     f/s/o                  f/s/o
-VDS3  f/s/o   f/s/o     f/s/o                  f/s/o
+VDS15  f/s/o   f/s/o     f/s/o                  f/s/o
+VDS14  f/s/o   f/s/o     f/s/o                  f/s/o
+VDS13  f/s/o   f/s/o     f/s/o                  f/s/o
 ....  .....   .....     .....
 ....
 ....
-VDS15 f/s/o   f/s/o     f/s/0                  f/s/o
+VDS1   f/s/o   f/s/o     f/s/0                  f/s/o
 
 
 """
@@ -23,16 +23,28 @@ import pandas as pd
 import os
 import numpy as np
 import scipy.misc
+import glob
 
+# to get the range of flow,occupancy and speed for image normalization purpose
+pwd = os.path.abspath('.') 
+all_flow_filenames = [i for i in glob.glob(pwd+'/Data/*_flow.xlsx')]
+all_speed_filenames = [i for i in glob.glob(pwd+'/Data/*_speed.xlsx')]
+all_occupancy_filenames = [i for i in glob.glob(pwd+'/Data/*_occupancy.xlsx')]
+all_flow_csv = pd.concat([pd.read_excel(f) for f in all_flow_filenames ])
+all_speed_csv = pd.concat([pd.read_excel(f) for f in all_speed_filenames ])
+all_occupancy_csv = pd.concat([pd.read_excel(f) for f in all_occupancy_filenames ])
+all_flow_csv.to_csv( pwd+"/Data/all_flow.csv", index=False, encoding='utf-8-sig') #0-540
+all_speed_csv.to_csv( pwd+"/Data/all_speed.csv", index=False, encoding='utf-8-sig')#4.3-78.4
+all_occupancy_csv.to_csv( pwd+"/Data/all_occupancy.csv", index=False, encoding='utf-8-sig')#0-0.65
 
 def GetFlowMatrix(df):
     '''
     Get the data matrix of flow rates of the 15 VDSs
             t    t+5min  t+10min   ....
-    VDS1    
-    VDS2
+    VDS15    
+    VDS14
     ....
-    VDS15  
+    VDS1  
     '''
     nrow = df.shape[0]
     VDS_list = df.VDS.unique()
@@ -47,10 +59,10 @@ def GetOccupancyMatrix(df):
     '''
     Get the data matrix of occupancy of the 15 VDSs
             t    t+5min  t+10min   ....
-    VDS1    
-    VDS2
+    VDS15    
+    VDS14
     ....
-    VDS15  
+    VDS1  
     '''
     nrow = df.shape[0]
     VDS_list = df.VDS.unique()
@@ -65,10 +77,10 @@ def GetSpeedMatrix(df):
     '''
     Get the data matrix of speed of the 15 VDSs
             t    t+5min  t+10min   ....
-    VDS1    
-    VDS2
+    VDS15    
+    VDS14
     ....
-    VDS15  
+    VDS1  
     '''
     
     nrow = df.shape[0]
@@ -84,10 +96,10 @@ def GetObRateMatrix(df):
     '''
     Get the data matrix of observation rate of the 15 VDSs
             t    t+5min  t+10min   ....
-    VDS1    
-    VDS2
+    VDS15    
+    VDS14
     ....
-    VDS15  
+    VDS1  
     '''
     
     nrow = df.shape[0]
@@ -113,16 +125,25 @@ def SaveImage(df, window_len, GetDataFun, datatype, date):
     '''
     mat = GetDataFun(df)
     mat_len = mat.shape[1]
-    pwd = os.path.abspath('.') 
+    pwd = os.path.abspath('.')
     for i in range(mat_len - window_len):
         mat_window = mat[:,i:i+window_len]
         out_path = pwd+'/Pics/{}/{}_{}_{}.jpg'.format(datatype,datatype,date,i)
-        scipy.misc.imsave(out_path, mat_window)
+        if datatype == 'flow':
+            scipy.misc.toimage(mat_window, cmin = 0.0, cmax = 540).save(out_path)
+        elif datatype == 'speed':
+            scipy.misc.toimage(mat_window, cmin = 4.3, cmax = 78.4).save(out_path)
+        elif datatype == 'occupancy':
+            scipy.misc.toimage(mat_window, cmin = 0.0, cmax = 0.65).save(out_path)
+        else:
+            scipy.misc.toimage(mat_window, cmin = 0.0, cmax = 100).save(out_path)
 
-pwd = os.path.abspath('.')
-# Save the data of total 7 days to images
-for i in range(17): 
-    date = 1015 + i
+# Save the data of total 31 days to images
+for i in range(31):
+    if i > 16:
+        date = 1101+i-17
+    else:
+        date = 1015 + i
     filepath_flow = pwd + '/Data/{}_flow.xlsx'.format(date)
     filepath_speed = pwd + '/Data/{}_speed.xlsx'.format(date)
     filepath_occupancy = pwd + '/Data/{}_occupancy.xlsx'.format(date)       

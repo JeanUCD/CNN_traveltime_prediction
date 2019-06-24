@@ -248,7 +248,7 @@ def train(n_epochs, model):
     return loss_over_time,test_loss,accuracy_test,accuracy_train
 
 # define the number of epochs to train for
-n_epochs = 500
+n_epochs = 102
 
 # call train and record the loss and accuracy over time
 training_loss, test_loss, accuracy_test, accuracy_train = train(n_epochs,net)
