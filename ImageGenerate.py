@@ -138,12 +138,12 @@ def SaveImage(df, window_len, GetDataFun, datatype, date):
         else:
             scipy.misc.toimage(mat_window, cmin = 0.0, cmax = 100).save(out_path)
 
-# Save the data of total 31 days to images
-for i in range(31):
-    if i > 16:
-        date = 1101+i-17
+# Save the data of total 32 days to images
+for i in range(33):
+    if i > 17:
+        date = 1101+i-18
     else:
-        date = 1015 + i
+        date = 1014 + i
     filepath_flow = pwd + '/Data/{}_flow.xlsx'.format(date)
     filepath_speed = pwd + '/Data/{}_speed.xlsx'.format(date)
     filepath_occupancy = pwd + '/Data/{}_occupancy.xlsx'.format(date)       

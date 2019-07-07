@@ -40,10 +40,10 @@ class TTdataset(Dataset):
 
     def __getitem__(self, idx):
         img_name = os.path.join(self.root_dir,
-                                self.traveltime_frame.iloc[idx, 2])
+                                self.traveltime_frame.iloc[idx, 3])
         # Normalize the pixel values to [0,1]
         image = io.imread(img_name)/255
-        traveltime = self.traveltime_frame.iloc[idx, 1]
+        traveltime = self.traveltime_frame.iloc[idx, 2]
         sample = {'image': image, 'traveltime': traveltime}
 
         if self.transform:

@@ -44,16 +44,16 @@ class TTdataset(Dataset):
 
     def __getitem__(self, idx):
         img_name1 = os.path.join(self.root_dir1,
-                                self.traveltime_frame1.iloc[idx, 2])
+                                self.traveltime_frame1.iloc[idx, 3])
         img_name2 = os.path.join(self.root_dir2,
-                                self.traveltime_frame2.iloc[idx, 2])
+                                self.traveltime_frame2.iloc[idx, 3])
         img_name3 = os.path.join(self.root_dir3,
-                                self.traveltime_frame3.iloc[idx, 2])
+                                self.traveltime_frame3.iloc[idx, 3])
         # Normalize the pixel values to [0,1]
-        image1 = io.imread(img_name1)/255
-        image2 = io.imread(img_name2)/255
-        image3 = io.imread(img_name3)/255
-        traveltime = self.traveltime_frame1.iloc[idx, 1]
+        image1 = io.imread(img_name1)
+        image2 = io.imread(img_name2)
+        image3 = io.imread(img_name3)
+        traveltime = self.traveltime_frame1.iloc[idx, 2]
         image = np.array([[image1,image2,image3]])
         sample = {'image': image, 'traveltime': traveltime}
 
