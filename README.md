@@ -1,6 +1,8 @@
 # Understand traffic as images
 ### Use Convolutional Neural Network to predict travel time on I-80E from Davis to West Sacramento
 
+## Report
+see [TTP 289A Report](https://github.com/JeanUCD/CNN_traveltime_prediction/blob/master/TTP%20289A%20Report%20-%20Jin%20Guo.pdf)
 ## Slides
 see [Learning traffic deeply as images with partially observed data.pptx](https://github.com/JeanUCD/CNN_traveltime_prediction/blob/master/Learning%20traffic%20deeply%20as%20images%20with%20partially%20observed%20data.pptx)
 
