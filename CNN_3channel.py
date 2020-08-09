@@ -95,12 +95,11 @@ class Net(nn.Module):
     def __init__(self):
         super(Net, self).__init__()
         
-        # 4 input image channels (speed, flow, occupancy, observation), 10 output channels/feature maps
+        # 3 input image channels (speed, flow, occupancy), 10 output channels/feature maps
         # 3x3 square convolution kernel
         ## output size = (W-F+2*P)/S +1 = (15-3)/1 +1 = 13
         # W: input width, F: kernel_size P: padding S: stride
         # the output Tensor for one image, will have the dimensions: (10, 13, 13)
-        # after one pool layer, this becomes (10, 13, 13)
         self.conv1 = nn.Conv2d(3, 10, 3)
         self.conv1_bn = nn.BatchNorm2d(10)
         # maxpool layer
